@@ -141,7 +141,8 @@
             // 
             // SaveFileDialog
             // 
-            this.SaveFileDialog.DefaultExt = "XML file|*.xml";
+            this.SaveFileDialog.DefaultExt = "*.xml";
+            this.SaveFileDialog.Filter = "XML file|*.xml";
             // 
             // MainForm
             // 

@@ -14,10 +14,12 @@ namespace XMLParserWinForms
     {
         private string WARNING_CAPTION = "Warning";
         private string ERROR_CAPTION = "Error";
-        private string FILE_NOT_SAVED = "File is not saved.\nDo you want to save it before closing?";
-        private string FILE_CANT_SAVE = "Can't save file.";
-        private string FILE_CANT_LOAD = "Can't load file.";
-        private string FILE_CANT_READ = "Can't read file.";
+        private string INFO_CAPTION = "Information";
+        private string FILE_SAVED = "File \"{0}\" successfully saved!";
+        private string FILE_NOT_SAVED = "File \"{0}\" is not saved.\nDo you want to save it before closing?";
+        private string FILE_CANT_SAVE = "Can't save file \"{0}\".";
+        private string FILE_CANT_LOAD = "Can't load file \"{0}\".";
+        private string FILE_CANT_READ = "Can't read file \"{0}\".";
 
         public MainForm()
         {
@@ -39,7 +41,12 @@ namespace XMLParserWinForms
             catch (XmlException)
             {
                 result = null;
-                MessageBox.Show(FILE_CANT_LOAD, ERROR_CAPTION, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    String.Format(FILE_CANT_LOAD, fileName),
+                    ERROR_CAPTION,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                    );
             }
             return result;
         }
@@ -64,11 +71,48 @@ namespace XMLParserWinForms
             {
                 info.Document.Save(info.FilePath);
                 result = true;
+                MessageBox.Show(
+                    String.Format(FILE_SAVED,
+                    info.FilePath),
+                    INFO_CAPTION,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                    );
             }
             catch (XmlException)
             {
                 result = false;
-                MessageBox.Show(FILE_CANT_SAVE, ERROR_CAPTION, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    String.Format(FILE_CANT_SAVE,
+                    info.FilePath),
+                    ERROR_CAPTION,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                    );
+            }
+            return result;
+        }
+
+        private bool CloseSelectedTab()
+        {
+            return CloseTab(XmlTabsControl.SelectedIndex);
+        }
+
+        private bool CloseTab(int index)
+        {
+            bool result = false;
+            if ((index >= 0) || (index < XmlTabsControl.TabCount))
+            {
+                TabPage tab = XmlTabsControl.TabPages[index];
+                result = canCloseTab(tab);
+                if (result)
+                {
+                    if (index > 0)
+                    {
+                        XmlTabsControl.SelectedIndex = (index - 1);
+                    }
+                    XmlTabsControl.TabPages.Remove(tab);
+                }
             }
             return result;
         }
@@ -93,7 +137,7 @@ namespace XMLParserWinForms
             if (!result)
             {
                 DialogResult answ = MessageBox.Show(
-                    FILE_NOT_SAVED,
+                    String.Format(FILE_NOT_SAVED, info.FilePath),
                     WARNING_CAPTION,
                     MessageBoxButtons.YesNoCancel,
                     MessageBoxIcon.Exclamation
@@ -177,7 +221,7 @@ namespace XMLParserWinForms
                 return;
             }
 
-            info.Saved = true;
+            //info.Saved = true;
 
             tree.Dock = DockStyle.Fill;
             tab.Controls.Add(tree);
@@ -248,25 +292,28 @@ namespace XMLParserWinForms
 
         private void MainForm_CloseTab(object sender, EventArgs e)
         {
-            int index = XmlTabsControl.SelectedIndex;
-            if ((index < 0) || (index > XmlTabsControl.TabCount))
-                return;
-
-            TabPage tab = XmlTabsControl.SelectedTab;
-            if (canCloseTab(tab))
-            {
-                if (index > 0)
-                {
-                    XmlTabsControl.SelectedIndex = (index - 1);
-                }
-                XmlTabsControl.TabPages.Remove(tab);
-            }
+            CloseSelectedTab();
         }
         
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // ToDo: ask to save all unsaved files; CloseFile for each tab
-            //                                      (abort on first [Cancel])
+            FileInfo info = null;
+            foreach (TabPage tab in XmlTabsControl.TabPages)
+            {
+                info = (tab.Tag as FileInfo);
+                if (info != null)
+                {
+                    if (info.Saved == false)
+                    {
+                        XmlTabsControl.SelectedTab = tab;
+                        if (CloseSelectedTab() == false)
+                        {
+                            e.Cancel = true;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
 
