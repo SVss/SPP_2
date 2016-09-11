@@ -12,18 +12,115 @@ namespace XMLParserWinForms
 {
     public partial class MainForm : Form
     {
+        private string WARNING_CAPTION = "Warning";
+        private string ERROR_CAPTION = "Error";
+        private string FILE_NOT_SAVED = "File is not saved.\nDo you want to save it before closing?";
+        private string FILE_EXISTS_REWRITE = "File already exists.\nDo you want to rewrite it?";
+        private string FILE_CANT_SAVE = "Can't save file.";
+
         public MainForm()
         {
             InitializeComponent();
         }
 
 
+        // Internal functions
+
+        private bool SaveFileAs(FileInfo info)
+        {
+            bool result = false;
+            DialogResult answ = SaveFileDialog.ShowDialog();
+            if (answ == DialogResult.OK)
+            {
+                string fileName = SaveFileDialog.FileNames[0];
+                if (System.IO.File.Exists(fileName))
+                {
+                    result = canRewriteFile();
+                }
+
+                info.FileName = fileName;
+                result = SaveFile(info);
+            }
+            return result;
+        }
+
+        private bool SaveFile(FileInfo info)
+        {
+            bool result = false;
+            try
+            {
+                info.Document.Save(info.FileName);
+                result = true;
+            }
+            catch (XmlException)
+            {
+                result = false;
+                MessageBox.Show(FILE_CANT_SAVE, ERROR_CAPTION, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return result;
+        }
+
+        private bool canRewriteFile()
+        {
+            DialogResult answ = MessageBox.Show(
+                FILE_EXISTS_REWRITE,
+                WARNING_CAPTION,
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+                );
+            return (answ == DialogResult.Yes);
+        }
+
+        private bool canCloseTab(TabPage tab)
+        {
+            bool result = true;
+            if (tab != null)
+            {
+                FileInfo info = (tab.Tag as FileInfo);
+                if (info != null)
+                {
+                    result = canCloseFile(info);
+                }
+            }
+            return result;
+        }
+
+        private bool canCloseFile(FileInfo info)
+        {
+            bool result = info.Saved;
+            if (!result)
+            {
+                DialogResult answ = MessageBox.Show(
+                    FILE_NOT_SAVED,
+                    WARNING_CAPTION,
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Exclamation
+                    );
+
+                switch (answ)
+                {
+                    case DialogResult.Cancel:
+                        result = false;
+                        break;
+
+                    case DialogResult.No:
+                        result = true;
+                        break;
+
+                    case DialogResult.Yes:
+                        result = SaveFile(info);
+                        break;
+                }
+            }
+            return result;
+        }
+
+
         // File Menu Items actions
 
-        private void OpenFile(object sender, EventArgs e)
+        private void MainForm_OpenFile(object sender, EventArgs e)
         {
             DialogResult openResult = OpenFileDialog.ShowDialog();
-
             if (openResult == DialogResult.OK)
             {
                 string fileName = OpenFileDialog.FileNames[0];
@@ -33,7 +130,7 @@ namespace XMLParserWinForms
                 {
                     doc.Load(fileName);
                 }
-                catch (XmlException ex)
+                catch (XmlException)
                 {
                     MessageBox.Show("Can't load file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -42,22 +139,22 @@ namespace XMLParserWinForms
             }
         }
 
-        private void SaveFile(object sender, EventArgs e)
+        private void MainForm_SaveFile(object sender, EventArgs e)
         {
             // ToDO...
         }
 
-        private void SaveFileAs(object sender, EventArgs e)
+        private void MainForm_SaveFileAs(object sender, EventArgs e)
         {
             // ToDo...
         }
 
-        private void CloseFile(object sender, EventArgs e)
+        private void MainForm_CloseFile(object sender, EventArgs e)
         {
             // ToDo: ask to save unsaved file [Yes/No/Cancel]; close tab on [Yes/No]
         }
 
-        private void QuitProgram(object sender, EventArgs e)
+        private void MainForm_QuitProgram(object sender, EventArgs e)
         {
             this.Close();
         }
@@ -65,16 +162,31 @@ namespace XMLParserWinForms
 
         // Tab Menu Items actions
 
-        private void NewTab(object sender, EventArgs e)
+        private void MainForm_NewTab(object sender, EventArgs e)
         {
             TabPage tab = new TabPage("New tab");
+            tab.Tag = null;
+
             XmlTabsControl.TabPages.Add(tab);
             XmlTabsControl.SelectTab(tab);
         }
 
-        private void CloseTab(object sender, EventArgs e)
+        private void MainForm_CloseTab(object sender, EventArgs e)
         {
-            // ToDo: ask for savig if not saved            
+            int index = XmlTabsControl.SelectedIndex;
+            if ((index < 0) || (index > XmlTabsControl.TabCount))
+                return;
+
+            TabPage tab = (XmlTabsControl.Controls[index] as TabPage);
+            if (canCloseTab(tab))
+            {
+                if (index > 0)
+                {
+                    XmlTabsControl.SelectedIndex = (index - 1);
+                }
+
+                XmlTabsControl.Controls.Remove(tab);
+            }
         }
         
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -86,15 +198,12 @@ namespace XMLParserWinForms
 
         // TabsControl Events
 
-        private void TabChanged(object sender, TabControlEventArgs e)
-        {
-            // ToDo: make enabled when file is opened
-            SaveFileMenuItem.Enabled = SaveAsFileMenuItem.Enabled = CloseFileMenuItem.Enabled = (true);
-        }
-
         private void XmlTabsControl_ControlRemoved(object sender, ControlEventArgs e)
         {
-            
+            SaveFileMenuItem.Enabled =
+                SaveAsFileMenuItem.Enabled =
+                CloseFileMenuItem.Enabled =
+                (XmlTabsControl.TabCount > 0);
         }
     }
 }
