@@ -8,15 +8,22 @@ namespace XMLParserWinForms
 {
     class FileInfo
     {
-        public string FileName { get; set; }
+        public string FilePath { get; set; }
+
+        public string FileName {
+            get
+            {
+                return System.IO.Path.GetFileName(this.FilePath);
+            }
+        }
 
         public bool Saved { get; set; }
 
         public XmlDocument Document { get; set; }
 
-        public FileInfo(string fileName)
+        public FileInfo(string path)
         {
-            this.FileName = fileName;
+            this.FilePath = path;
             this.Saved = false;
         }
     }

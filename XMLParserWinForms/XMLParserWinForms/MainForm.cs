@@ -15,8 +15,9 @@ namespace XMLParserWinForms
         private string WARNING_CAPTION = "Warning";
         private string ERROR_CAPTION = "Error";
         private string FILE_NOT_SAVED = "File is not saved.\nDo you want to save it before closing?";
-        private string FILE_EXISTS_REWRITE = "File already exists.\nDo you want to rewrite it?";
         private string FILE_CANT_SAVE = "Can't save file.";
+        private string FILE_CANT_LOAD = "Can't load file.";
+        private string FILE_CANT_READ = "Can't read file.";
 
         public MainForm()
         {
@@ -26,19 +27,31 @@ namespace XMLParserWinForms
 
         // Internal functions
 
-        private bool SaveFileAs(FileInfo info)
+        private XmlDocument LoadFile(string fileName)
+        {
+            XmlDocument result = null;
+            XmlDocument doc = new XmlDocument();
+            try
+            {
+                doc.Load(fileName);
+                result = doc;
+            }
+            catch (XmlException)
+            {
+                result = null;
+                MessageBox.Show(FILE_CANT_LOAD, ERROR_CAPTION, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return result;
+        }
+
+        private bool SaveFileAs(ref FileInfo info)
         {
             bool result = false;
             DialogResult answ = SaveFileDialog.ShowDialog();
             if (answ == DialogResult.OK)
             {
-                string fileName = SaveFileDialog.FileNames[0];
-                if (System.IO.File.Exists(fileName))
-                {
-                    result = canRewriteFile();
-                }
-
-                info.FileName = fileName;
+                string filePath = SaveFileDialog.FileNames[0];
+                info.FilePath = filePath;
                 result = SaveFile(info);
             }
             return result;
@@ -49,7 +62,7 @@ namespace XMLParserWinForms
             bool result = false;
             try
             {
-                info.Document.Save(info.FileName);
+                info.Document.Save(info.FilePath);
                 result = true;
             }
             catch (XmlException)
@@ -58,17 +71,6 @@ namespace XMLParserWinForms
                 MessageBox.Show(FILE_CANT_SAVE, ERROR_CAPTION, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return result;
-        }
-
-        private bool canRewriteFile()
-        {
-            DialogResult answ = MessageBox.Show(
-                FILE_EXISTS_REWRITE,
-                WARNING_CAPTION,
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning
-                );
-            return (answ == DialogResult.Yes);
         }
 
         private bool canCloseTab(TabPage tab)
@@ -116,42 +118,120 @@ namespace XMLParserWinForms
         }
 
 
+        private TabPage GetTabByFile(string filePath)
+        {
+            TabPage result = null;
+            FileInfo info = null;
+            foreach (var tab in XmlTabsControl.Controls)
+            {
+                result = (tab as TabPage);
+                if (result != null)
+                {
+                    info = (result.Tag as FileInfo);
+                    if (info != null)
+                    {
+                        if (info.FilePath == filePath)
+                        {
+                            return result;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
         // File Menu Items actions
 
         private void MainForm_OpenFile(object sender, EventArgs e)
         {
             DialogResult openResult = OpenFileDialog.ShowDialog();
-            if (openResult == DialogResult.OK)
+            if (openResult != DialogResult.OK)
             {
-                string fileName = OpenFileDialog.FileNames[0];
-
-                XmlDocument doc = new XmlDocument();
-                try
-                {
-                    doc.Load(fileName);
-                }
-                catch (XmlException)
-                {
-                    MessageBox.Show("Can't load file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                
-                // ToDo: load document to TreeView
+                return;
             }
+            
+            string filePath = OpenFileDialog.FileNames[0];
+            TabPage tab = GetTabByFile(filePath);
+            if (tab != null)
+            {
+                XmlTabsControl.SelectedTab = tab;
+                return;
+            }
+
+            FileInfo info = new FileInfo(filePath);
+            info.Document = LoadFile(filePath);
+            if (info.Document == null)
+            {
+                return;
+            }
+
+            string name = info.FileName;
+            tab = new TabPage(name);
+            tab.Tag = info;
+
+            TreeView tree = new TreeView();
+            if (XmlTreeHelper.XmlDocumentToTreeNodes(ref tree, info.Document) == false)
+            {
+                MessageBox.Show(
+                    FILE_CANT_READ,
+                    ERROR_CAPTION,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                    );
+                return;
+            }
+
+            info.Saved = true;
+
+            tree.Dock = DockStyle.Fill;
+            tab.Controls.Add(tree);
+            XmlTabsControl.TabPages.Add(tab);
+            XmlTabsControl.SelectTab(tab);
         }
 
         private void MainForm_SaveFile(object sender, EventArgs e)
         {
-            // ToDO...
+            if (XmlTabsControl.SelectedTab == null)
+            {
+                return;
+            }
+
+            FileInfo info = (XmlTabsControl.SelectedTab.Tag as FileInfo);
+            if (info != null)
+            {
+                SaveFile(info);
+            }
+            else
+            {
+
+            }
         }
 
         private void MainForm_SaveFileAs(object sender, EventArgs e)
         {
-            // ToDo...
+            if (XmlTabsControl.SelectedTab == null)
+            {
+                return;
+            }
+
+            FileInfo info = (XmlTabsControl.SelectedTab.Tag as FileInfo);
+            if (info != null)
+            {
+                if (SaveFileAs(ref info))
+                {
+                    XmlTabsControl.SelectedTab.Text = info.FileName;
+                }
+            }
+            else
+            {
+
+            }
         }
 
         private void MainForm_CloseFile(object sender, EventArgs e)
         {
-            // ToDo: ask to save unsaved file [Yes/No/Cancel]; close tab on [Yes/No]
+            MainForm_CloseTab(sender, e);
         }
 
         private void MainForm_QuitProgram(object sender, EventArgs e)
@@ -177,14 +257,13 @@ namespace XMLParserWinForms
             if ((index < 0) || (index > XmlTabsControl.TabCount))
                 return;
 
-            TabPage tab = (XmlTabsControl.Controls[index] as TabPage);
+            TabPage tab = XmlTabsControl.SelectedTab;
             if (canCloseTab(tab))
             {
                 if (index > 0)
                 {
                     XmlTabsControl.SelectedIndex = (index - 1);
                 }
-
                 XmlTabsControl.Controls.Remove(tab);
             }
         }
@@ -198,12 +277,22 @@ namespace XMLParserWinForms
 
         // TabsControl Events
 
-        private void XmlTabsControl_ControlRemoved(object sender, ControlEventArgs e)
+        private void setMenuItems(object sender)
         {
             SaveFileMenuItem.Enabled =
                 SaveAsFileMenuItem.Enabled =
                 CloseFileMenuItem.Enabled =
-                (XmlTabsControl.TabCount > 0);
+                ((sender as TabControl).Controls.Count > 0);
+        }
+
+        private void XmlTabsControl_ControlRemoved(object sender, ControlEventArgs e)
+        {
+            setMenuItems(sender);
+        }
+
+        private void XmlTabsControl_ControlAdded(object sender, ControlEventArgs e)
+        {
+            setMenuItems(sender);
         }
     }
 }

@@ -130,6 +130,7 @@
             this.XmlTabsControl.SelectedIndex = 0;
             this.XmlTabsControl.Size = new System.Drawing.Size(457, 388);
             this.XmlTabsControl.TabIndex = 1;
+            this.XmlTabsControl.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.XmlTabsControl_ControlAdded);
             this.XmlTabsControl.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.XmlTabsControl_ControlRemoved);
             // 
             // OpenFileDialog
