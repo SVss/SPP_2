@@ -37,6 +37,9 @@
             this.CloseFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Separator2FileMenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.ExitFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.TabMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.NewTabMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CloseTabMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.XmlTabsControl = new System.Windows.Forms.TabControl();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.MainMenu.SuspendLayout();
@@ -45,7 +48,8 @@
             // MainMenu
             // 
             this.MainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.FileMenuItem});
+            this.FileMenuItem,
+            this.TabMenuItem});
             this.MainMenu.Location = new System.Drawing.Point(0, 0);
             this.MainMenu.Name = "MainMenu";
             this.MainMenu.Size = new System.Drawing.Size(457, 24);
@@ -101,7 +105,7 @@
             this.CloseFileMenuItem.Name = "CloseFileMenuItem";
             this.CloseFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F4)));
             this.CloseFileMenuItem.Size = new System.Drawing.Size(193, 22);
-            this.CloseFileMenuItem.Text = "Close file";
+            this.CloseFileMenuItem.Text = "Close";
             this.CloseFileMenuItem.Click += new System.EventHandler(this.CloseFile);
             // 
             // Separator2FileMenuItem
@@ -117,6 +121,33 @@
             this.ExitFileMenuItem.Text = "Exit";
             this.ExitFileMenuItem.Click += new System.EventHandler(this.QuitProgram);
             // 
+            // TabMenuItem
+            // 
+            this.TabMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.NewTabMenuItem,
+            this.CloseTabMenuItem});
+            this.TabMenuItem.Name = "TabMenuItem";
+            this.TabMenuItem.Size = new System.Drawing.Size(39, 20);
+            this.TabMenuItem.Text = "Tab";
+            // 
+            // NewTabMenuItem
+            // 
+            this.NewTabMenuItem.Name = "NewTabMenuItem";
+            this.NewTabMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.N)));
+            this.NewTabMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.NewTabMenuItem.Text = "New";
+            this.NewTabMenuItem.Click += new System.EventHandler(this.NewTab);
+            // 
+            // CloseTabMenuItem
+            // 
+            this.CloseTabMenuItem.Name = "CloseTabMenuItem";
+            this.CloseTabMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.F4)));
+            this.CloseTabMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.CloseTabMenuItem.Text = "Close";
+            this.CloseTabMenuItem.Click += new System.EventHandler(this.CloseTab);
+            // 
             // XmlTabsControl
             // 
             this.XmlTabsControl.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -126,6 +157,8 @@
             this.XmlTabsControl.SelectedIndex = 0;
             this.XmlTabsControl.Size = new System.Drawing.Size(457, 388);
             this.XmlTabsControl.TabIndex = 1;
+            this.XmlTabsControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.TabChanged);
+            this.XmlTabsControl.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.XmlTabsControl_ControlRemoved);
             // 
             // OpenFileDialog
             // 
@@ -143,6 +176,7 @@
             this.MainMenuStrip = this.MainMenu;
             this.Name = "MainForm";
             this.Text = "XML Editor";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.MainMenu.ResumeLayout(false);
             this.MainMenu.PerformLayout();
             this.ResumeLayout(false);
@@ -158,11 +192,14 @@
         private System.Windows.Forms.ToolStripSeparator Separator1FileMenuItem;
         private System.Windows.Forms.ToolStripMenuItem SaveFileMenuItem;
         private System.Windows.Forms.ToolStripMenuItem SaveAsFileMenuItem;
-        private System.Windows.Forms.TabControl XmlTabsControl;
         private System.Windows.Forms.ToolStripMenuItem CloseFileMenuItem;
         private System.Windows.Forms.ToolStripSeparator Separator2FileMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ExitFileMenuItem;
         private System.Windows.Forms.OpenFileDialog OpenFileDialog;
+        private System.Windows.Forms.TabControl XmlTabsControl;
+        private System.Windows.Forms.ToolStripMenuItem TabMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem NewTabMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem CloseTabMenuItem;
 
     }
 }
