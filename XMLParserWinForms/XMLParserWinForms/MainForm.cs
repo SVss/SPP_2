@@ -221,7 +221,7 @@ namespace XMLParserWinForms
                 return;
             }
 
-            //info.Saved = true;
+            info.Saved = true;
 
             tree.Dock = DockStyle.Fill;
             tab.Controls.Add(tree);
@@ -239,7 +239,7 @@ namespace XMLParserWinForms
             FileInfo info = (XmlTabsControl.SelectedTab.Tag as FileInfo);
             if (info != null)
             {
-                SaveFile(info);
+                info.Saved = SaveFile(info);
             }
             else
             {
@@ -257,7 +257,8 @@ namespace XMLParserWinForms
             FileInfo info = (XmlTabsControl.SelectedTab.Tag as FileInfo);
             if (info != null)
             {
-                if (SaveFileAs(ref info))
+                info.Saved = SaveFileAs(ref info);
+                if (info.Saved)
                 {
                     XmlTabsControl.SelectedTab.Text = info.FileName;
                 }
