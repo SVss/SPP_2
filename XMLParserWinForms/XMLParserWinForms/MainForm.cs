@@ -120,20 +120,15 @@ namespace XMLParserWinForms
 
         private TabPage GetTabByFile(string filePath)
         {
-            TabPage result = null;
             FileInfo info = null;
-            foreach (var tab in XmlTabsControl.Controls)
+            foreach (TabPage tab in XmlTabsControl.TabPages)
             {
-                result = (tab as TabPage);
-                if (result != null)
+                info = (tab.Tag as FileInfo);
+                if (info != null)
                 {
-                    info = (result.Tag as FileInfo);
-                    if (info != null)
+                    if (info.FilePath == filePath)
                     {
-                        if (info.FilePath == filePath)
-                        {
-                            return result;
-                        }
+                        return tab;
                     }
                 }
             }
@@ -264,7 +259,7 @@ namespace XMLParserWinForms
                 {
                     XmlTabsControl.SelectedIndex = (index - 1);
                 }
-                XmlTabsControl.Controls.Remove(tab);
+                XmlTabsControl.TabPages.Remove(tab);
             }
         }
         
