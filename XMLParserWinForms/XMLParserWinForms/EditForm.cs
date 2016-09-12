@@ -42,20 +42,30 @@ namespace XMLParserWinForms
             return result;
         }
 
+        private bool DataNotChanged()
+        {
+            bool result = true;
+            result &= (NameTextBox.Text.Trim() == xmlElement.Attributes[XmlTreeHelper.METHOD_NAME_ATTR].Value);
+            result &= (ParamsTextBox.Text.Trim() == xmlElement.Attributes[XmlTreeHelper.PARAMS_ATTR].Value);
+            result &= (PackageTextBox.Text.Trim() == xmlElement.Attributes[XmlTreeHelper.PACKAGE_ATTR].Value);
+            result &= (TimeTextBox.Text.Trim() == xmlElement.Attributes[XmlTreeHelper.TIME_ATTR].Value);
+            return result;
+        }
+
         private void LoadXmlData(XmlElement xe)
         {
-            pInstanse.xmlElement = xe;
-            pInstanse.NameTextBox.Text = xe.Attributes[XmlTreeHelper.METHOD_NAME_ATTR].Value;
-            pInstanse.ParamsTextBox.Text = xe.Attributes[XmlTreeHelper.PARAMS_ATTR].Value;
-            pInstanse.PackageTextBox.Text = xe.Attributes[XmlTreeHelper.PACKAGE_ATTR].Value;
-            pInstanse.TimeTextBox.Text = xe.Attributes[XmlTreeHelper.TIME_ATTR].Value;
+            xmlElement = xe;
+            NameTextBox.Text = xe.Attributes[XmlTreeHelper.METHOD_NAME_ATTR].Value;
+            ParamsTextBox.Text = xe.Attributes[XmlTreeHelper.PARAMS_ATTR].Value;
+            PackageTextBox.Text = xe.Attributes[XmlTreeHelper.PACKAGE_ATTR].Value;
+            TimeTextBox.Text = xe.Attributes[XmlTreeHelper.TIME_ATTR].Value;
         }
 
         private void UpdateXmlData(XmlElement xe)
         {
-            xe.SetAttribute(XmlTreeHelper.METHOD_NAME_ATTR, pInstanse.NameTextBox.Text);
-            xe.SetAttribute(XmlTreeHelper.PARAMS_ATTR, pInstanse.ParamsTextBox.Text);
-            xe.SetAttribute(XmlTreeHelper.PACKAGE_ATTR, pInstanse.PackageTextBox.Text);
+            xe.SetAttribute(XmlTreeHelper.METHOD_NAME_ATTR, pInstanse.NameTextBox.Text.Trim());
+            xe.SetAttribute(XmlTreeHelper.PARAMS_ATTR, pInstanse.ParamsTextBox.Text.Trim());
+            xe.SetAttribute(XmlTreeHelper.PACKAGE_ATTR, pInstanse.PackageTextBox.Text.Trim());
             // add new time
             xe.SetAttribute(XmlTreeHelper.NEW_TIME_ATTR, pInstanse.TimeTextBox.Text);
         }
@@ -68,6 +78,39 @@ namespace XMLParserWinForms
             pInstanse.PackageTextBox.Clear();
             pInstanse.TimeTextBox.Clear();
         }
+
+        private void ResetButton_Click(object sender, EventArgs e)
+        {
+            LoadXmlData(xmlElement);
+        }
+
+        private void OkButton_Click(object sender, EventArgs e)
+        {
+            if (HasErrors())
+            {
+                MessageBox.Show(
+                    "There are some errors in data.\nCan't accept.",
+                    "Warning",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                    );
+            }
+            else
+            {
+                if (DataNotChanged())
+                {
+                    this.DialogResult = DialogResult.Cancel;
+                }
+                else
+                {
+                    this.DialogResult = DialogResult.OK;
+                }
+                this.Close();
+            }
+        }
+
+
+        // public
 
         public static bool EditNodeXmlData(TreeNode node)
         {
@@ -94,29 +137,6 @@ namespace XMLParserWinForms
 
             pInstanse.ClearXmlData();
             return result;
-        }
-
-        private void ResetButton_Click(object sender, EventArgs e)
-        {
-            LoadXmlData(xmlElement);
-        }
-
-        private void OkButton_Click(object sender, EventArgs e)
-        {
-            if (HasErrors())
-            {
-                MessageBox.Show(
-                    "There are some errors in data.\nCan't accept.",
-                    "Warning",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning
-                    );
-            }
-            else
-            {
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-            }
         }
 
     }

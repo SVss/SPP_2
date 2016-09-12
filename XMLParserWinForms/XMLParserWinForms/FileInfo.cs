@@ -24,7 +24,7 @@ namespace XMLParserWinForms
         public FileInfo(string path)
         {
             this.FilePath = path;
-            this.Saved = false;
+            this.Saved = true;
         }
     }
 }

@@ -218,6 +218,14 @@ namespace XMLParserWinForms
                 tree.BeginUpdate();
                 XmlTreeHelper.UpdateTreeUpFromNode(e.Node);
                 tree.EndUpdate();
+
+                TabPage tab = XmlTabsControl.SelectedTab;
+                FileInfo info = (tab.Tag as FileInfo);
+                if (info != null)
+                {
+                    info.Saved = false;
+                    tab.Text = info.FileName + "*";
+                }
             }
         }
 
@@ -280,15 +288,20 @@ namespace XMLParserWinForms
 
         private void MainForm_SaveFile(object sender, EventArgs e)
         {
-            if (XmlTabsControl.SelectedTab == null)
+            TabPage tab = XmlTabsControl.SelectedTab;
+            if (tab == null)
             {
                 return;
             }
 
-            FileInfo info = (XmlTabsControl.SelectedTab.Tag as FileInfo);
+            FileInfo info = (tab.Tag as FileInfo);
             if (info != null)
             {
                 info.Saved = SaveFile(info);
+                if (info.Saved)
+                {
+                    tab.Text = info.FileName;
+                }
             }
             else
             {
@@ -298,18 +311,19 @@ namespace XMLParserWinForms
 
         private void MainForm_SaveFileAs(object sender, EventArgs e)
         {
-            if (XmlTabsControl.SelectedTab == null)
+            TabPage tab = XmlTabsControl.SelectedTab;
+            if (tab == null)
             {
                 return;
             }
 
-            FileInfo info = (XmlTabsControl.SelectedTab.Tag as FileInfo);
+            FileInfo info = (tab.Tag as FileInfo);
             if (info != null)
             {
                 info.Saved = SaveFileAs(ref info);
                 if (info.Saved)
                 {
-                    XmlTabsControl.SelectedTab.Text = info.FileName;
+                    tab.Text = info.FileName;
                 }
             }
             else
