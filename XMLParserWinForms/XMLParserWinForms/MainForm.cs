@@ -21,6 +21,8 @@ namespace XMLParserWinForms
         private string FILE_CANT_LOAD = "Can't load file \"{0}\".";
         private string FILE_CANT_READ = "Can't read file \"{0}\".";
 
+        private bool blnDoubleClick = false;
+
         public MainForm()
         {
             InitializeComponent();
@@ -183,6 +185,26 @@ namespace XMLParserWinForms
 
         // TreeView Actions
 
+        private void TreeView_BeforeCollapse(object sender, TreeViewCancelEventArgs e)
+        {
+            if (blnDoubleClick == true && e.Action == TreeViewAction.Collapse)
+                e.Cancel = true;
+        }
+
+        private void TreeView_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            if (blnDoubleClick == true && e.Action == TreeViewAction.Expand)
+                e.Cancel = true;
+        }
+
+        private void TreeView_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Clicks > 1)
+                blnDoubleClick = true;
+            else
+                blnDoubleClick = false;
+        }
+
         private void TreeView_EditNode(object sender, TreeNodeMouseClickEventArgs e)
         {
             MessageBox.Show("Edit Node");
@@ -236,6 +258,11 @@ namespace XMLParserWinForms
             tree.Dock = DockStyle.Fill;
             tab.Controls.Add(tree);
             tree.NodeMouseDoubleClick += TreeView_EditNode;
+
+            // to prevent flickering on doubleClick
+            tree.MouseDown += TreeView_MouseDown;
+            tree.BeforeCollapse += TreeView_BeforeCollapse;
+            tree.BeforeExpand += TreeView_BeforeExpand;
 
             XmlTabsControl.TabPages.Add(tab);
             XmlTabsControl.SelectTab(tab);
