@@ -40,7 +40,7 @@ namespace XMLParserWinForms
             return result;
         }
 
-        public static TreeNode XmlElementToTreeNode(XmlElement xe)
+        private static TreeNode XmlElementToTreeNode(XmlElement xe)
         {
             TreeNode result = new TreeNode();
             result.Tag = xe;    // use Tag to store XmlElement ref
