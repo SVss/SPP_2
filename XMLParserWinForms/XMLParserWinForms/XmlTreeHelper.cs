@@ -9,25 +9,33 @@ namespace XMLParserWinForms
 {
     static class XmlTreeHelper
     {
+        public const string METHOD_TAG = "method";
+        public const string THREAD_TAG = "thread";
+        public const string THREAD_ID_ATTR = "id";
+        public const string METHOD_NAME_ATTR = "name";
+        public const string TIME_ATTR = "time";
+        public const string PARAMS_ATTR = "params";
+        public const string PACKAGE_ATTR = "package";
+
         private static string XmlAttributesToSting(XmlElement node)
         {
             string result = "";
-            if (node.Name == "thread")
+            if (node.Name == THREAD_TAG)
             {
-                result += "id=" + node.Attributes["id"].Value + " ";
-                result += "time=" + node.Attributes["time"].Value;
+                result += THREAD_ID_ATTR + "=" + node.Attributes[THREAD_ID_ATTR].Value + " ";
+                result += TIME_ATTR + "=" + node.Attributes[TIME_ATTR].Value;
             }
-            else if (node.Name == "method")
+            else if (node.Name == METHOD_TAG)
             {
-                result += "Params=";
+                result += PARAMS_ATTR + "=";
                 string paramsCount = "0";
-                if (node.HasAttribute("params"))
+                if (node.HasAttribute(PARAMS_ATTR))
                 {
-                    paramsCount = node.Attributes["params"].Value;
+                    paramsCount = node.Attributes[PARAMS_ATTR].Value;
                 }
                 result += paramsCount + " ";
-                result += "Package=" + node.Attributes["package"] + " ";
-                result += "time=" + node.Attributes["time"];
+                result += PACKAGE_ATTR + "=" + node.Attributes[PACKAGE_ATTR] + " ";
+                result += TIME_ATTR + "=" + node.Attributes[TIME_ATTR];
             }
             return result;
         }
@@ -38,9 +46,9 @@ namespace XMLParserWinForms
             result.Tag = xe;    // use Tag to store XmlElement ref
 
             string name = xe.Name;
-            if (name == "method")
+            if (name == METHOD_TAG)
             {
-                name = xe.Attributes["name"].Value;
+                name = xe.Attributes[METHOD_NAME_ATTR].Value;
             }
 
             result.Text = name + " (" + XmlAttributesToSting(xe) + ")";
