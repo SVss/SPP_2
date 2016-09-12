@@ -180,6 +180,16 @@ namespace XMLParserWinForms
             return null;
         }
 
+
+        // TreeView Actions
+
+        private void TreeView_EditNode(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            MessageBox.Show("Edit Node");
+            return;
+        }
+
+
         // File Menu Items actions
 
         private void MainForm_OpenFile(object sender, EventArgs e)
@@ -225,6 +235,8 @@ namespace XMLParserWinForms
 
             tree.Dock = DockStyle.Fill;
             tab.Controls.Add(tree);
+            tree.NodeMouseDoubleClick += TreeView_EditNode;
+
             XmlTabsControl.TabPages.Add(tab);
             XmlTabsControl.SelectTab(tab);
         }

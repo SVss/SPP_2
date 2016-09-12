@@ -35,6 +35,8 @@ namespace XMLParserWinForms
         public static TreeNode XmlElementToTreeNode(XmlElement xe)
         {
             TreeNode result = new TreeNode();
+            result.Tag = xe;    // use Tag to store XmlElement ref
+
             string name = xe.Name;
             if (name == "method")
             {

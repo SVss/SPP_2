@@ -153,7 +153,7 @@
             this.Controls.Add(this.MainMenu);
             this.MainMenuStrip = this.MainMenu;
             this.Name = "MainForm";
-            this.Text = "XML Editor";
+            this.Text = "TracerXML Editor";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.MainMenu.ResumeLayout(false);
             this.MainMenu.PerformLayout();
