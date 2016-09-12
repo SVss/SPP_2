@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.NameLabel = new System.Windows.Forms.Label();
-            this.NameTextBox = new System.Windows.Forms.TextBox();
             this.ParamsTextBox = new System.Windows.Forms.TextBox();
             this.ParamsLabel = new System.Windows.Forms.Label();
             this.PackageTextBox = new System.Windows.Forms.TextBox();
@@ -40,6 +39,7 @@
             this.OkButton = new System.Windows.Forms.Button();
             this.CancelButton = new System.Windows.Forms.Button();
             this.ResetButton = new System.Windows.Forms.Button();
+            this.NameTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // NameLabel
@@ -50,13 +50,6 @@
             this.NameLabel.Size = new System.Drawing.Size(75, 13);
             this.NameLabel.TabIndex = 0;
             this.NameLabel.Text = "Method name:";
-            // 
-            // NameTextBox
-            // 
-            this.NameTextBox.Location = new System.Drawing.Point(93, 12);
-            this.NameTextBox.Name = "NameTextBox";
-            this.NameTextBox.Size = new System.Drawing.Size(179, 20);
-            this.NameTextBox.TabIndex = 1;
             // 
             // ParamsTextBox
             // 
@@ -93,6 +86,7 @@
             // TimeTextBox
             // 
             this.TimeTextBox.Location = new System.Drawing.Point(93, 107);
+            this.TimeTextBox.MaxLength = 10;
             this.TimeTextBox.Name = "TimeTextBox";
             this.TimeTextBox.Size = new System.Drawing.Size(131, 20);
             this.TimeTextBox.TabIndex = 7;
@@ -118,13 +112,13 @@
             // 
             // OkButton
             // 
-            this.OkButton.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.OkButton.Location = new System.Drawing.Point(15, 157);
             this.OkButton.Name = "OkButton";
             this.OkButton.Size = new System.Drawing.Size(75, 23);
             this.OkButton.TabIndex = 9;
             this.OkButton.Text = "OK";
             this.OkButton.UseVisualStyleBackColor = true;
+            this.OkButton.Click += new System.EventHandler(this.OkButton_Click);
             // 
             // CancelButton
             // 
@@ -145,6 +139,13 @@
             this.ResetButton.Text = "Reset";
             this.ResetButton.UseVisualStyleBackColor = true;
             this.ResetButton.Click += new System.EventHandler(this.ResetButton_Click);
+            // 
+            // NameTextBox
+            // 
+            this.NameTextBox.Location = new System.Drawing.Point(93, 12);
+            this.NameTextBox.Name = "NameTextBox";
+            this.NameTextBox.Size = new System.Drawing.Size(179, 20);
+            this.NameTextBox.TabIndex = 1;
             // 
             // EditForm
             // 
@@ -174,7 +175,6 @@
         #endregion
 
         private System.Windows.Forms.Label NameLabel;
-        private System.Windows.Forms.TextBox NameTextBox;
         private System.Windows.Forms.TextBox ParamsTextBox;
         private System.Windows.Forms.Label ParamsLabel;
         private System.Windows.Forms.TextBox PackageTextBox;
@@ -185,6 +185,7 @@
         private System.Windows.Forms.Button OkButton;
         private System.Windows.Forms.Button CancelButton;
         private System.Windows.Forms.Button ResetButton;
+        private System.Windows.Forms.TextBox NameTextBox;
 
     }
 }

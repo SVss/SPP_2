@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -15,14 +15,31 @@ namespace XMLParserWinForms
         private static EditForm pInstanse = new EditForm();
         private XmlElement xmlElement = null;
 
+        private Regex IDENTIFIER_REGEX = new Regex(@"[a-z_]\w*", RegexOptions.IgnoreCase);
+        private Regex NUMBER_REGEX = new Regex(@"(0|[1-9]\d*)");
+
         private EditForm()
         {
             InitializeComponent();
         }
 
+        private bool Matches(string s, Regex rx)
+        {
+            string text = s.Trim();
+            return (rx.Match(text).Value == text);
+        }
+
         private bool HasErrors()
         {
-            return false;
+            bool result = false;
+
+            result |= !Matches(pInstanse.NameTextBox.Text, IDENTIFIER_REGEX);
+            result |= !Matches(pInstanse.PackageTextBox.Text, IDENTIFIER_REGEX);
+
+            result |= !Matches(pInstanse.ParamsTextBox.Text, NUMBER_REGEX);
+            result |= !Matches(pInstanse.TimeTextBox.Text, NUMBER_REGEX);
+
+            return result;
         }
 
         private void LoadXmlData(XmlElement xe)
@@ -83,5 +100,24 @@ namespace XMLParserWinForms
         {
             LoadXmlData(xmlElement);
         }
+
+        private void OkButton_Click(object sender, EventArgs e)
+        {
+            if (HasErrors())
+            {
+                MessageBox.Show(
+                    "There are some errors in data.\nCan't accept.",
+                    "Warning",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                    );
+            }
+            else
+            {
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+            }
+        }
+
     }
 }
