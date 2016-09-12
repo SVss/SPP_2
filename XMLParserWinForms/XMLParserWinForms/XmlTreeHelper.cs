@@ -14,6 +14,7 @@ namespace XMLParserWinForms
         public const string THREAD_ID_ATTR = "id";
         public const string METHOD_NAME_ATTR = "name";
         public const string TIME_ATTR = "time";
+        public const string NEW_TIME_ATTR = "new-time";
         public const string PARAMS_ATTR = "params";
         public const string PACKAGE_ATTR = "package";
 
@@ -33,25 +34,34 @@ namespace XMLParserWinForms
                 {
                     paramsCount = node.Attributes[PARAMS_ATTR].Value;
                 }
+                else
+                {
+                    node.SetAttribute(PARAMS_ATTR, "0");
+                }
                 result += paramsCount + " ";
-                result += PACKAGE_ATTR + "=" + node.Attributes[PACKAGE_ATTR] + " ";
-                result += TIME_ATTR + "=" + node.Attributes[TIME_ATTR];
+                result += PACKAGE_ATTR + "=" + node.Attributes[PACKAGE_ATTR].Value + " ";
+                result += TIME_ATTR + "=" + node.Attributes[TIME_ATTR].Value;
             }
             return result;
         }
 
-        private static TreeNode XmlElementToTreeNode(XmlElement xe)
+        private static string GetNodeText(XmlElement xe)
         {
-            TreeNode result = new TreeNode();
-            result.Tag = xe;    // use Tag to store XmlElement ref
-
             string name = xe.Name;
             if (name == METHOD_TAG)
             {
                 name = xe.Attributes[METHOD_NAME_ATTR].Value;
             }
 
-            result.Text = name + " (" + XmlAttributesToSting(xe) + ")";
+            return name + " (" + XmlAttributesToSting(xe) + ")";
+        }
+
+        private static TreeNode XmlElementToTreeNode(XmlElement xe)
+        {
+            TreeNode result = new TreeNode();
+            result.Tag = xe;    // use Tag to store XmlElement 
+            result.Text = GetNodeText(xe);
+
             try
             {
                 foreach (var child in xe.ChildNodes)
@@ -89,5 +99,38 @@ namespace XMLParserWinForms
             }
             return result;
         }
+
+        public static void UpdateTreeUpFromNode(TreeNode node)
+        {
+            XmlElement xe = (node.Tag as XmlElement);
+            if (xe == null)
+            {
+                return;
+            }
+            long newTime = Convert.ToInt64(xe.Attributes[NEW_TIME_ATTR].Value);
+            long oldTime = Convert.ToInt64(xe.Attributes[TIME_ATTR].Value);
+            long diffTime = newTime - oldTime;
+
+            xe.SetAttribute(TIME_ATTR, xe.Attributes[NEW_TIME_ATTR].Value);
+            xe.RemoveAttribute(NEW_TIME_ATTR);
+
+            node.Text = GetNodeText(xe);
+
+            do
+            {
+                node = node.Parent;
+                xe = (node.Tag as XmlElement);
+                if (xe == null)
+                {
+                    return;
+                }
+                oldTime = Convert.ToInt64(xe.Attributes[TIME_ATTR].Value);
+                newTime = oldTime + diffTime;
+                xe.SetAttribute(TIME_ATTR, Convert.ToString(newTime));
+
+                node.Text = GetNodeText(xe);
+            } while (node.Parent != null);
+        }
+
     }
 }

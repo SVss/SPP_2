@@ -207,8 +207,18 @@ namespace XMLParserWinForms
 
         private void TreeView_EditNode(object sender, TreeNodeMouseClickEventArgs e)
         {
-            MessageBox.Show("Edit Node");
-            return;
+            bool changed = EditForm.EditNodeXmlData(e.Node);
+            if (changed)
+            {
+                TreeView tree = (sender as TreeView);
+                if (tree == null)
+                {
+                    return;
+                }
+                tree.BeginUpdate();
+                XmlTreeHelper.UpdateTreeUpFromNode(e.Node);
+                tree.EndUpdate();
+            }
         }
 
 
