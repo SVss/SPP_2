@@ -138,13 +138,13 @@
             // 
             // ResetButton
             // 
-            this.ResetButton.DialogResult = System.Windows.Forms.DialogResult.Retry;
             this.ResetButton.Location = new System.Drawing.Point(197, 157);
             this.ResetButton.Name = "ResetButton";
             this.ResetButton.Size = new System.Drawing.Size(75, 23);
             this.ResetButton.TabIndex = 11;
             this.ResetButton.Text = "Reset";
             this.ResetButton.UseVisualStyleBackColor = true;
+            this.ResetButton.Click += new System.EventHandler(this.ResetButton_Click);
             // 
             // EditForm
             // 

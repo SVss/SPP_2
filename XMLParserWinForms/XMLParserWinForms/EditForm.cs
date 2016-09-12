@@ -13,6 +13,7 @@ namespace XMLParserWinForms
     public partial class EditForm : Form
     {
         private static EditForm pInstanse = new EditForm();
+        private XmlElement xmlElement = null;
 
         private EditForm()
         {
@@ -26,6 +27,7 @@ namespace XMLParserWinForms
 
         private void LoadXmlData(XmlElement xe)
         {
+            pInstanse.xmlElement = xe;
             pInstanse.NameTextBox.Text = xe.Attributes[XmlTreeHelper.METHOD_NAME_ATTR].Value;
             pInstanse.ParamsTextBox.Text = xe.Attributes[XmlTreeHelper.PARAMS_ATTR].Value;
             pInstanse.PackageTextBox.Text = xe.Attributes[XmlTreeHelper.PACKAGE_ATTR].Value;
@@ -43,6 +45,7 @@ namespace XMLParserWinForms
 
         private void ClearXmlData()
         {
+            xmlElement = null;
             pInstanse.NameTextBox.Clear();
             pInstanse.ParamsTextBox.Clear();
             pInstanse.PackageTextBox.Clear();
@@ -74,6 +77,11 @@ namespace XMLParserWinForms
 
             pInstanse.ClearXmlData();
             return result;
+        }
+
+        private void ResetButton_Click(object sender, EventArgs e)
+        {
+            LoadXmlData(xmlElement);
         }
     }
 }
