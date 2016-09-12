@@ -12,14 +12,14 @@ namespace XMLParserWinForms
 {
     public partial class MainForm : Form
     {
-        private string WARNING_CAPTION = "Warning";
-        private string ERROR_CAPTION = "Error";
-        private string INFO_CAPTION = "Information";
-        private string FILE_SAVED = "File \"{0}\" successfully saved!";
-        private string FILE_NOT_SAVED = "File \"{0}\" is not saved.\nDo you want to save it before closing?";
-        private string FILE_CANT_SAVE = "Can't save file \"{0}\".";
-        private string FILE_CANT_LOAD = "Can't load file \"{0}\".";
-        private string FILE_CANT_READ = "Can't read file \"{0}\".";
+        private const string WARNING_CAPTION = "Warning";
+        private const string ERROR_CAPTION = "Error";
+        private const string INFO_CAPTION = "Information";
+        private const string FILE_SAVED = "File \"{0}\" successfully saved!";
+        private const string FILE_NOT_SAVED = "File \"{0}\" is not saved.\nDo you want to save it before closing?";
+        private const string FILE_CANT_SAVE = "Can't save file \"{0}\".";
+        private const string FILE_CANT_LOAD = "Can't load file \"{0}\".";
+        private const string FILE_CANT_READ = "Can't read file \"{0}\".";
 
         private bool blnDoubleClick = false;
 
