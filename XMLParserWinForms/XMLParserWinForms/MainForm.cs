@@ -367,14 +367,11 @@ namespace XMLParserWinForms
                 info = (tab.Tag as FileInfo);
                 if (info != null)
                 {
-                    if (info.Saved == false)
+                    XmlTabsControl.SelectedTab = tab;
+                    if (CloseSelectedTab() == false)
                     {
-                        XmlTabsControl.SelectedTab = tab;
-                        if (CloseSelectedTab() == false)
-                        {
-                            e.Cancel = true;
-                            break;
-                        }
+                        e.Cancel = true;
+                        break;
                     }
                 }
             }
