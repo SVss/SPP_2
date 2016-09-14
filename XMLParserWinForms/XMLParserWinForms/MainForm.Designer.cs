@@ -73,7 +73,7 @@
             this.OpenFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
             this.OpenFileMenuItem.Size = new System.Drawing.Size(193, 22);
             this.OpenFileMenuItem.Text = "Open";
-            this.OpenFileMenuItem.Click += new System.EventHandler(this.MainForm_OpenFile);
+            this.OpenFileMenuItem.Click += new System.EventHandler(this.OpenFileEvent);
             // 
             // Separator1FileMenuItem
             // 
@@ -87,7 +87,7 @@
             this.SaveFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.SaveFileMenuItem.Size = new System.Drawing.Size(193, 22);
             this.SaveFileMenuItem.Text = "Save";
-            this.SaveFileMenuItem.Click += new System.EventHandler(this.MainForm_SaveFile);
+            this.SaveFileMenuItem.Click += new System.EventHandler(this.SaveFileEvent);
             // 
             // SaveAsFileMenuItem
             // 
@@ -97,7 +97,7 @@
             | System.Windows.Forms.Keys.S)));
             this.SaveAsFileMenuItem.Size = new System.Drawing.Size(193, 22);
             this.SaveAsFileMenuItem.Text = "Save as...";
-            this.SaveAsFileMenuItem.Click += new System.EventHandler(this.MainForm_SaveFileAs);
+            this.SaveAsFileMenuItem.Click += new System.EventHandler(this.SaveFileAsEvent);
             // 
             // CloseFileMenuItem
             // 
@@ -106,7 +106,7 @@
             this.CloseFileMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F4)));
             this.CloseFileMenuItem.Size = new System.Drawing.Size(193, 22);
             this.CloseFileMenuItem.Text = "Close";
-            this.CloseFileMenuItem.Click += new System.EventHandler(this.MainForm_CloseFile);
+            this.CloseFileMenuItem.Click += new System.EventHandler(this.CloseFileEvent);
             // 
             // Separator2FileMenuItem
             // 
@@ -130,8 +130,8 @@
             this.XmlTabsControl.SelectedIndex = 0;
             this.XmlTabsControl.Size = new System.Drawing.Size(457, 388);
             this.XmlTabsControl.TabIndex = 1;
-            this.XmlTabsControl.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.XmlTabsControl_ControlAdded);
-            this.XmlTabsControl.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.XmlTabsControl_ControlRemoved);
+            this.XmlTabsControl.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.XmlTabControlAddedEvent);
+            this.XmlTabsControl.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.XmlTabControlRemovedEvent);
             // 
             // OpenFileDialog
             // 
@@ -154,7 +154,7 @@
             this.MainMenuStrip = this.MainMenu;
             this.Name = "MainForm";
             this.Text = "TracerXML Editor";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormClosingEvent);
             this.MainMenu.ResumeLayout(false);
             this.MainMenu.PerformLayout();
             this.ResumeLayout(false);

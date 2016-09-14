@@ -41,6 +41,9 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="TracerLib">
+      <HintPath>..\..\..\Lab1 - Profiler\TracerLib\TracerLib\bin\Debug\TracerLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EditForm.cs">

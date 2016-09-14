@@ -183,7 +183,7 @@
         private System.Windows.Forms.Label TimeLabel;
         private System.Windows.Forms.Label MsLabel;
         private System.Windows.Forms.Button OkButton;
-        private System.Windows.Forms.Button CancelButton;
+        private new System.Windows.Forms.Button CancelButton;
         private System.Windows.Forms.Button ResetButton;
         private System.Windows.Forms.TextBox NameTextBox;
 

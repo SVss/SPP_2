@@ -45,29 +45,29 @@ namespace XMLParserWinForms
         private bool DataNotChanged()
         {
             bool result = true;
-            result &= (NameTextBox.Text.Trim() == xmlElement.Attributes[XmlTreeHelper.METHOD_NAME_ATTR].Value);
-            result &= (ParamsTextBox.Text.Trim() == xmlElement.Attributes[XmlTreeHelper.PARAMS_ATTR].Value);
-            result &= (PackageTextBox.Text.Trim() == xmlElement.Attributes[XmlTreeHelper.PACKAGE_ATTR].Value);
-            result &= (TimeTextBox.Text.Trim() == xmlElement.Attributes[XmlTreeHelper.TIME_ATTR].Value);
+            result &= (NameTextBox.Text.Trim() == xmlElement.Attributes[TracerLib.XmlConstants.NameAttribute].Value);
+            result &= (ParamsTextBox.Text.Trim() == xmlElement.Attributes[TracerLib.XmlConstants.ParamsAttribute].Value);
+            result &= (PackageTextBox.Text.Trim() == xmlElement.Attributes[TracerLib.XmlConstants.PackageAttribute].Value);
+            result &= (TimeTextBox.Text.Trim() == xmlElement.Attributes[TracerLib.XmlConstants.TimeAttribute].Value);
             return result;
         }
 
         private void LoadXmlData(XmlElement xe)
         {
             xmlElement = xe;
-            NameTextBox.Text = xe.Attributes[XmlTreeHelper.METHOD_NAME_ATTR].Value;
-            ParamsTextBox.Text = xe.Attributes[XmlTreeHelper.PARAMS_ATTR].Value;
-            PackageTextBox.Text = xe.Attributes[XmlTreeHelper.PACKAGE_ATTR].Value;
-            TimeTextBox.Text = xe.Attributes[XmlTreeHelper.TIME_ATTR].Value;
+            NameTextBox.Text = xe.Attributes[TracerLib.XmlConstants.NameAttribute].Value;
+            ParamsTextBox.Text = xe.Attributes[TracerLib.XmlConstants.ParamsAttribute].Value;
+            PackageTextBox.Text = xe.Attributes[TracerLib.XmlConstants.PackageAttribute].Value;
+            TimeTextBox.Text = xe.Attributes[TracerLib.XmlConstants.TimeAttribute].Value;
         }
 
         private void UpdateXmlData(XmlElement xe)
         {
-            xe.SetAttribute(XmlTreeHelper.METHOD_NAME_ATTR, pInstanse.NameTextBox.Text.Trim());
-            xe.SetAttribute(XmlTreeHelper.PARAMS_ATTR, pInstanse.ParamsTextBox.Text.Trim());
-            xe.SetAttribute(XmlTreeHelper.PACKAGE_ATTR, pInstanse.PackageTextBox.Text.Trim());
+            xe.SetAttribute(TracerLib.XmlConstants.NameAttribute, pInstanse.NameTextBox.Text.Trim());
+            xe.SetAttribute(TracerLib.XmlConstants.ParamsAttribute, pInstanse.ParamsTextBox.Text.Trim());
+            xe.SetAttribute(TracerLib.XmlConstants.PackageAttribute, pInstanse.PackageTextBox.Text.Trim());
             // add new time
-            xe.SetAttribute(XmlTreeHelper.NEW_TIME_ATTR, pInstanse.TimeTextBox.Text);
+            xe.SetAttribute(XmlTreeHelper.NewTimeAttribute, pInstanse.TimeTextBox.Text);
         }
 
         private void ClearXmlData()
@@ -109,8 +109,7 @@ namespace XMLParserWinForms
             }
         }
 
-
-        // public
+        // Public
 
         public static bool EditNodeXmlData(TreeNode node)
         {
@@ -120,7 +119,7 @@ namespace XMLParserWinForms
                 return false;
             }
 
-            if (xe.Name == XmlTreeHelper.THREAD_TAG)
+            if (xe.Name == TracerLib.XmlConstants.ThreadTag)
             {
                 return false;
             }
