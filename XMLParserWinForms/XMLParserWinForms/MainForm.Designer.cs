@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.MainMenu = new System.Windows.Forms.MenuStrip();
             this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -40,7 +41,11 @@
             this.XmlTabsControl = new System.Windows.Forms.TabControl();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.SaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.ExpandAllTreeContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CollapseAllTreeContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.TreeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.MainMenu.SuspendLayout();
+            this.TreeContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainMenu
@@ -144,6 +149,28 @@
             this.SaveFileDialog.DefaultExt = "*.xml";
             this.SaveFileDialog.Filter = "XML file|*.xml";
             // 
+            // ExpandAllTreeContextMenuItem
+            // 
+            this.ExpandAllTreeContextMenuItem.Name = "ExpandAllTreeContextMenuItem";
+            this.ExpandAllTreeContextMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.ExpandAllTreeContextMenuItem.Text = "Expand All";
+            this.ExpandAllTreeContextMenuItem.Click += new System.EventHandler(this.ExpandAllTreeEvent);
+            // 
+            // CollapseAllTreeContextMenuItem
+            // 
+            this.CollapseAllTreeContextMenuItem.Name = "CollapseAllTreeContextMenuItem";
+            this.CollapseAllTreeContextMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.CollapseAllTreeContextMenuItem.Text = "Collapse All";
+            this.CollapseAllTreeContextMenuItem.Click += new System.EventHandler(this.CollapseAllTreeEvent);
+            // 
+            // TreeContextMenuStrip
+            // 
+            this.TreeContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ExpandAllTreeContextMenuItem,
+            this.CollapseAllTreeContextMenuItem});
+            this.TreeContextMenuStrip.Name = "TreeContextMenu";
+            this.TreeContextMenuStrip.Size = new System.Drawing.Size(153, 70);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -157,6 +184,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormClosingEvent);
             this.MainMenu.ResumeLayout(false);
             this.MainMenu.PerformLayout();
+            this.TreeContextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -176,6 +204,9 @@
         private System.Windows.Forms.OpenFileDialog OpenFileDialog;
         private System.Windows.Forms.TabControl XmlTabsControl;
         private System.Windows.Forms.SaveFileDialog SaveFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem ExpandAllTreeContextMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem CollapseAllTreeContextMenuItem;
+        private System.Windows.Forms.ContextMenuStrip TreeContextMenuStrip;
 
     }
 }

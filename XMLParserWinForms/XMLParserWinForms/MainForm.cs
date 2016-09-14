@@ -60,12 +60,12 @@ namespace XMLParserWinForms
             {
                 info.Document.Save(info.FilePath);
                 result = true;
-                MessageBox.Show(
-                    String.Format(MessagesConsts.FileSavedMessage, info.FilePath),
-                    MessagesConsts.InfoMessageCaption,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information
-                    );
+                //MessageBox.Show(
+                //    String.Format(MessagesConsts.FileSavedMessage, info.FilePath),
+                //    MessagesConsts.InfoMessageCaption,
+                //    MessageBoxButtons.OK,
+                //    MessageBoxIcon.Information
+                //    );
             }
             catch (XmlException)
             {
@@ -259,6 +259,7 @@ namespace XMLParserWinForms
             info.Saved = true;
 
             tree.Dock = DockStyle.Fill;
+            tree.ContextMenuStrip = TreeContextMenuStrip;
             tab.Controls.Add(tree);
             tree.NodeMouseDoubleClick += EditNodeEvent;
 
@@ -378,6 +379,44 @@ namespace XMLParserWinForms
         {
             UpdateFileMenuItems(sender);
         }
+
+        // Context menu for TreeView
+
+        private TreeView GetTree(object sender)
+        {
+            ToolStripMenuItem menuItem = (sender as ToolStripMenuItem);
+            if (menuItem == null)
+            {
+                return null;
+            }
+            ContextMenuStrip menuStrip = (menuItem.Owner as ContextMenuStrip);
+            if (menuStrip == null)
+            {
+                return null;
+            }
+            TreeView result = (menuStrip.SourceControl as TreeView);
+
+            return result;
+        }
+
+        private void ExpandAllTreeEvent(object sender, EventArgs e)
+        {
+            TreeView tree = GetTree(sender);
+            if (tree != null)
+            {
+                tree.ExpandAll();
+            }
+        }
+
+        private void CollapseAllTreeEvent(object sender, EventArgs e)
+        {
+            TreeView tree = GetTree(sender);
+            if (tree != null)
+            {
+                tree.CollapseAll();
+            }
+        }
+
     }
 
     // Constants
@@ -387,7 +426,7 @@ namespace XMLParserWinForms
         public static string WarningMessageCaption { get { return "Warning"; } }
         public static string ErrorMessageCaption { get { return "Error"; } }
         public static string InfoMessageCaption { get { return "Information"; } }
-        public static string FileSavedMessage { get { return "File \"{0}\" successfully saved!"; } }
+        //public static string FileSavedMessage { get { return "File \"{0}\" successfully saved!"; } }
         public static string FileNotSavedMessage { get { return "File \"{0}\" is not saved.\nDo you want to save it before closing?"; } }
         public static string FileCantSaveMessage { get { return "Can't save file \"{0}\"."; } }
         public static string FileCantLoadMessage { get { return "Can't load file \"{0}\"."; } }
