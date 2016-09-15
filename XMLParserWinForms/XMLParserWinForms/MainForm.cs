@@ -344,18 +344,13 @@ namespace XMLParserWinForms
         
         private void FormClosingEvent(object sender, FormClosingEventArgs e)
         {
-            FileInfo info = null;
             foreach (TabPage tab in XmlTabsControl.TabPages)
             {
-                info = (tab.Tag as FileInfo);
-                if (info != null)
+                XmlTabsControl.SelectedTab = tab;
+                if (CloseSelectedTab() == false)
                 {
-                    XmlTabsControl.SelectedTab = tab;
-                    if (CloseSelectedTab() == false)
-                    {
-                        e.Cancel = true;
-                        break;
-                    }
+                    e.Cancel = true;
+                    break;
                 }
             }
         }
