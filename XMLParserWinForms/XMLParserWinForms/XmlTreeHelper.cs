@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml;
 using System.Windows.Forms;
-
-using TracerLib;
 
 namespace XMLParserWinForms
 {
@@ -60,9 +55,12 @@ namespace XMLParserWinForms
 
         private static TreeNode XmlElementToTreeNode(XmlElement xe)
         {
-            TreeNode result = new TreeNode();
-            result.Tag = xe;    // use Tag to store XmlElement 
-            result.Text = GetNodeText(xe);
+            TreeNode result = new TreeNode
+            {
+                Tag = xe,
+                Text = GetNodeText(xe)
+            };
+            // use Tag to store XmlElement 
             try
             {
                 foreach (var child in xe.ChildNodes)
@@ -79,22 +77,19 @@ namespace XMLParserWinForms
 
         // Public
 
-        public static TreeView XmlDocumentToTreeView(XmlDocument document)
+        public static TreeNode XmlDocumentToTreeNode(XmlDocument document)
         {
-            TreeView result = new TreeView();
+            TreeNode result = null;
             XmlElement xe = document.FirstChild as XmlElement;
             if (xe != null)
             {
                 try
                 {
-                    foreach (var child in xe.ChildNodes)
-                    {
-                        result.Nodes.Add(XmlElementToTreeNode(child as XmlElement));
-                    }
+                    result = XmlElementToTreeNode(xe);
                 }
                 catch(XmlException)
                 {
-                    result.Nodes.Clear();
+                    result = null;
                 }
             }
             return result;

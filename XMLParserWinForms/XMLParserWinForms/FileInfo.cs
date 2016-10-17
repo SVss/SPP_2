@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml;
+﻿using System.Xml;
 
 namespace XMLParserWinForms
 {
-    class FileInfo
+    internal class FileInfo
     {
         public string FilePath { get; set; }
 
-        public string FileName {
-            get
-            {
-                return System.IO.Path.GetFileName(this.FilePath);
-            }
-        }
+        public System.DateTime FileModificationTime { get; set; }
+
+        public string FileName => System.IO.Path.GetFileName(FilePath);
 
         public bool Saved { get; set; }
 
@@ -23,8 +16,9 @@ namespace XMLParserWinForms
 
         public FileInfo(string path)
         {
-            this.FilePath = path;
-            this.Saved = true;
+            FilePath = path;
+            FileModificationTime = (new System.IO.FileInfo(path)).LastWriteTime;
+            Saved = true;
         }
     }
 }

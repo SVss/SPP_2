@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
@@ -12,11 +7,11 @@ namespace XMLParserWinForms
 {
     public partial class EditForm : Form
     {
-        private static EditForm pInstanse = new EditForm();
-        private XmlElement xmlElement = null;
+        private static readonly EditForm Instanse = new EditForm();
+        private XmlElement _xmlElement;
 
-        private Regex IDENTIFIER_REGEX = new Regex(@"[a-z_]\w*", RegexOptions.IgnoreCase);
-        private Regex NUMBER_REGEX = new Regex(@"(0|[1-9]\d*)");
+        private readonly Regex _identifierRegex = new Regex(@"[a-z_]\w*", RegexOptions.IgnoreCase);
+        private readonly Regex _numberRegex = new Regex(@"(0|[1-9]\d*)");
 
         private EditForm()
         {
@@ -33,11 +28,11 @@ namespace XMLParserWinForms
         {
             bool result = false;
 
-            result |= !Matches(pInstanse.NameTextBox.Text, IDENTIFIER_REGEX);
-            result |= !Matches(pInstanse.PackageTextBox.Text, IDENTIFIER_REGEX);
+            result |= !Matches(Instanse.NameTextBox.Text, _identifierRegex);
+            result |= !Matches(Instanse.PackageTextBox.Text, _identifierRegex);
 
-            result |= !Matches(pInstanse.ParamsTextBox.Text, NUMBER_REGEX);
-            result |= !Matches(pInstanse.TimeTextBox.Text, NUMBER_REGEX);
+            result |= !Matches(Instanse.ParamsTextBox.Text, _numberRegex);
+            result |= !Matches(Instanse.TimeTextBox.Text, _numberRegex);
 
             return result;
         }
@@ -45,16 +40,16 @@ namespace XMLParserWinForms
         private bool DataNotChanged()
         {
             bool result = true;
-            result &= (NameTextBox.Text.Trim() == xmlElement.Attributes[TracerLib.XmlConstants.NameAttribute].Value);
-            result &= (ParamsTextBox.Text.Trim() == xmlElement.Attributes[TracerLib.XmlConstants.ParamsAttribute].Value);
-            result &= (PackageTextBox.Text.Trim() == xmlElement.Attributes[TracerLib.XmlConstants.PackageAttribute].Value);
-            result &= (TimeTextBox.Text.Trim() == xmlElement.Attributes[TracerLib.XmlConstants.TimeAttribute].Value);
+            result &= (NameTextBox.Text.Trim() == _xmlElement.Attributes[TracerLib.XmlConstants.NameAttribute].Value);
+            result &= (ParamsTextBox.Text.Trim() == _xmlElement.Attributes[TracerLib.XmlConstants.ParamsAttribute].Value);
+            result &= (PackageTextBox.Text.Trim() == _xmlElement.Attributes[TracerLib.XmlConstants.PackageAttribute].Value);
+            result &= (TimeTextBox.Text.Trim() == _xmlElement.Attributes[TracerLib.XmlConstants.TimeAttribute].Value);
             return result;
         }
 
         private void LoadXmlData(XmlElement xe)
         {
-            xmlElement = xe;
+            _xmlElement = xe;
             NameTextBox.Text = xe.Attributes[TracerLib.XmlConstants.NameAttribute].Value;
             ParamsTextBox.Text = xe.Attributes[TracerLib.XmlConstants.ParamsAttribute].Value;
             PackageTextBox.Text = xe.Attributes[TracerLib.XmlConstants.PackageAttribute].Value;
@@ -63,25 +58,25 @@ namespace XMLParserWinForms
 
         private void UpdateXmlData(XmlElement xe)
         {
-            xe.SetAttribute(TracerLib.XmlConstants.NameAttribute, pInstanse.NameTextBox.Text.Trim());
-            xe.SetAttribute(TracerLib.XmlConstants.ParamsAttribute, pInstanse.ParamsTextBox.Text.Trim());
-            xe.SetAttribute(TracerLib.XmlConstants.PackageAttribute, pInstanse.PackageTextBox.Text.Trim());
+            xe.SetAttribute(TracerLib.XmlConstants.NameAttribute, Instanse.NameTextBox.Text.Trim());
+            xe.SetAttribute(TracerLib.XmlConstants.ParamsAttribute, Instanse.ParamsTextBox.Text.Trim());
+            xe.SetAttribute(TracerLib.XmlConstants.PackageAttribute, Instanse.PackageTextBox.Text.Trim());
             // add new time
-            xe.SetAttribute(XmlTreeHelper.NewTimeAttribute, pInstanse.TimeTextBox.Text);
+            xe.SetAttribute(XmlTreeHelper.NewTimeAttribute, Instanse.TimeTextBox.Text);
         }
 
         private void ClearXmlData()
         {
-            xmlElement = null;
-            pInstanse.NameTextBox.Clear();
-            pInstanse.ParamsTextBox.Clear();
-            pInstanse.PackageTextBox.Clear();
-            pInstanse.TimeTextBox.Clear();
+            _xmlElement = null;
+            Instanse.NameTextBox.Clear();
+            Instanse.ParamsTextBox.Clear();
+            Instanse.PackageTextBox.Clear();
+            Instanse.TimeTextBox.Clear();
         }
 
         private void ResetButton_Click(object sender, EventArgs e)
         {
-            LoadXmlData(xmlElement);
+            LoadXmlData(_xmlElement);
         }
 
         private void OkButton_Click(object sender, EventArgs e)
@@ -89,23 +84,16 @@ namespace XMLParserWinForms
             if (HasErrors())
             {
                 MessageBox.Show(
-                    "There are some errors in data.\nCan't accept.",
-                    "Warning",
+                    MessagesConsts.HasErrorMessage,
+                    MessagesConsts.WarningMessageCaption,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning
                     );
             }
             else
             {
-                if (DataNotChanged())
-                {
-                    this.DialogResult = DialogResult.Cancel;
-                }
-                else
-                {
-                    this.DialogResult = DialogResult.OK;
-                }
-                this.Close();
+                DialogResult = DataNotChanged() ? DialogResult.Cancel : DialogResult.OK;
+                Close();
             }
         }
 
@@ -125,18 +113,22 @@ namespace XMLParserWinForms
             }
 
             bool result = false;
-            pInstanse.LoadXmlData(xe);
+            Instanse.LoadXmlData(xe);
 
-            DialogResult answ = pInstanse.ShowDialog();
+            DialogResult answ = Instanse.ShowDialog();
             if (answ == DialogResult.OK)
             {
-                pInstanse.UpdateXmlData(xe);
+                Instanse.UpdateXmlData(xe);
                 result = true;
             }
 
-            pInstanse.ClearXmlData();
+            Instanse.ClearXmlData();
             return result;
         }
+    }
 
+    internal static partial class MessagesConsts
+    {
+        public static string HasErrorMessage => "There are some errors in data.\nCan't accept.";
     }
 }

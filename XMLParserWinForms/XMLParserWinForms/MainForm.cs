@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -9,18 +6,18 @@ namespace XMLParserWinForms
 {
     public partial class MainForm : Form
     {
-        private bool blnDoubleClick = false;
+        private bool _blnDoubleClick;
 
         public MainForm()
         {
             InitializeComponent();
         }
+        
+        // Internal
 
-        // Internal functions
-
-        private XmlDocument LoadFile(string fileName)
+        private static XmlDocument LoadFile(string fileName)
         {
-            XmlDocument result = null;
+            XmlDocument result;
             XmlDocument doc = new XmlDocument();
             try
             {
@@ -31,13 +28,34 @@ namespace XMLParserWinForms
             {
                 result = null;
                 MessageBox.Show(
-                    String.Format(MessagesConsts.FileCantLoadMessage, fileName),
+                    string.Format(MessagesConsts.FileCantLoadMessage, fileName),
                     MessagesConsts.ErrorMessageCaption,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                     );
             }
             return result;
+        }
+
+        private static void LoadXmlTree(TreeView tree, XmlDocument doc)
+        {
+            TreeNode root = XmlTreeHelper.XmlDocumentToTreeNode(doc);
+            if (root == null)
+            {
+                MessageBox.Show(
+                    MessagesConsts.FileCantReadMessage,
+                    MessagesConsts.ErrorMessageCaption,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                    );
+                return;
+            }
+
+            tree.Nodes.Clear();
+            foreach(TreeNode node in root.Nodes)
+            {
+                tree.Nodes.Add(node);
+            }
         }
 
         private bool SaveFileAs(ref FileInfo info)
@@ -53,9 +71,9 @@ namespace XMLParserWinForms
             return result;
         }
 
-        private bool SaveFile(FileInfo info)
+        private static bool SaveFile(FileInfo info)
         {
-            bool result = false;
+            bool result;
             try
             {
                 info.Document.Save(info.FilePath);
@@ -107,43 +125,39 @@ namespace XMLParserWinForms
         private bool CanCloseTab(TabPage tab)
         {
             bool result = true;
-            if (tab != null)
+            FileInfo info = tab?.Tag as FileInfo;
+            if (info != null)
             {
-                FileInfo info = (tab.Tag as FileInfo);
-                if (info != null)
-                {
-                    result = CanCloseFile(info);
-                }
+                result = CanCloseFile(info);
             }
             return result;
         }
 
-        private bool CanCloseFile(FileInfo info)
+        private static bool CanCloseFile(FileInfo info)
         {
-            bool result = info.Saved;
-            if (!result)
+            if (info.Saved)
+                return true;
+
+            DialogResult answ = MessageBox.Show(
+                string.Format(MessagesConsts.FileNotSavedMessage, info.FilePath),
+                MessagesConsts.WarningMessageCaption,
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Exclamation
+            );
+
+            bool result = false;
+            switch (answ)
             {
-                DialogResult answ = MessageBox.Show(
-                    String.Format(MessagesConsts.FileNotSavedMessage, info.FilePath),
-                    MessagesConsts.WarningMessageCaption,
-                    MessageBoxButtons.YesNoCancel,
-                    MessageBoxIcon.Exclamation
-                    );
+                case DialogResult.Cancel:
+                    break;
 
-                switch (answ)
-                {
-                    case DialogResult.Cancel:
-                        result = false;
-                        break;
+                case DialogResult.No:
+                    result = true;
+                    break;
 
-                    case DialogResult.No:
-                        result = true;
-                        break;
-
-                    case DialogResult.Yes:
-                        result = SaveFile(info);
-                        break;
-                }
+                case DialogResult.Yes:
+                    result = SaveFile(info);
+                    break;
             }
             return result;
         }
@@ -151,10 +165,9 @@ namespace XMLParserWinForms
 
         private TabPage GetTabByFile(string filePath)
         {
-            FileInfo info = null;
             foreach (TabPage tab in XmlTabsControl.TabPages)
             {
-                info = (tab.Tag as FileInfo);
+                var info = (tab.Tag as FileInfo);
                 if (info != null)
                 {
                     if (info.FilePath == filePath)
@@ -170,22 +183,19 @@ namespace XMLParserWinForms
 
         private void BeforeCollapseEvent(object sender, TreeViewCancelEventArgs e)
         {
-            if (blnDoubleClick == true && e.Action == TreeViewAction.Collapse)
+            if (_blnDoubleClick && e.Action == TreeViewAction.Collapse)
                 e.Cancel = true;
         }
 
         private void BeforeExpandEvent(object sender, TreeViewCancelEventArgs e)
         {
-            if (blnDoubleClick == true && e.Action == TreeViewAction.Expand)
+            if (_blnDoubleClick && e.Action == TreeViewAction.Expand)
                 e.Cancel = true;
         }
 
         private void MouseDownEvent(object sender, MouseEventArgs e)
         {
-            if (e.Clicks > 1)
-                blnDoubleClick = true;
-            else
-                blnDoubleClick = false;
+            _blnDoubleClick = e.Clicks > 1;
         }
 
         private void EditNodeEvent(object sender, TreeNodeMouseClickEventArgs e)
@@ -207,11 +217,16 @@ namespace XMLParserWinForms
             tree.EndUpdate();
 
             TabPage tab = XmlTabsControl.SelectedTab;
+            MarkAsUnsaved(tab);
+        }
+
+        private static void MarkAsUnsaved(TabPage tab)
+        {
             FileInfo info = (tab.Tag as FileInfo);
             if (info != null)
             {
                 info.Saved = false;
-                tab.Text = info.FileName + "*";
+                tab.Text = info.FileName + StringConstants.UnsavedTabPostfix;
             }
         }
 
@@ -233,33 +248,30 @@ namespace XMLParserWinForms
                 return;
             }
 
-            FileInfo info = new FileInfo(filePath);
-            info.Document = LoadFile(filePath);
+            FileInfo info = new FileInfo(filePath)
+            {
+                Document = LoadFile(filePath)
+            };
+
             if (info.Document == null)
             {
                 return;
             }
 
             string name = info.FileName;
-            tab = new TabPage(name);
-            tab.Tag = info;
-
-            TreeView tree  = XmlTreeHelper.XmlDocumentToTreeView(info.Document);
-            if (tree.Nodes.Count == 0)
+            tab = new TabPage(name)
             {
-                MessageBox.Show(
-                    MessagesConsts.FileCantReadMessage,
-                    MessagesConsts.ErrorMessageCaption,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                    );
-                return;
-            }
+                Tag = info
+            };
+
+            TreeView tree = new TreeView();
+            LoadXmlTree(tree, info.Document);
 
             info.Saved = true;
 
             tree.Dock = DockStyle.Fill;
             tree.ContextMenuStrip = TreeContextMenuStrip;
+            tree.Name = StringConstants.TreeViewControlName;
             tab.Controls.Add(tree);
             tree.NodeMouseDoubleClick += EditNodeEvent;
 
@@ -318,26 +330,17 @@ namespace XMLParserWinForms
 
         private void CloseFileEvent(object sender, EventArgs e)
         {
-            CloseTabEvent(sender, e);
+            CloseTabEvent();
         }
 
         private void MainForm_QuitProgram(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         // Tab Menu Items actions
 
-        private void NewTabEvent(object sender, EventArgs e)
-        {
-            TabPage tab = new TabPage("New tab");
-            tab.Tag = null;
-
-            XmlTabsControl.TabPages.Add(tab);
-            XmlTabsControl.SelectTab(tab);
-        }
-
-        private void CloseTabEvent(object sender, EventArgs e)
+        private void CloseTabEvent()
         {
             CloseSelectedTab();
         }
@@ -355,14 +358,18 @@ namespace XMLParserWinForms
             }
         }
 
+        
+
         // TabsControl Events
 
         private void UpdateFileMenuItems(object sender)
         {
-            SaveFileMenuItem.Enabled =
-                SaveAsFileMenuItem.Enabled =
-                CloseFileMenuItem.Enabled =
-                ((sender as TabControl).Controls.Count > 0);
+            TabControl tabControl = sender as TabControl;
+            if (tabControl != null)
+                SaveFileMenuItem.Enabled =
+                    SaveAsFileMenuItem.Enabled =
+                        CloseFileMenuItem.Enabled =
+                            (tabControl.Controls.Count > 0);
         }
 
         private void XmlTabControlRemovedEvent(object sender, ControlEventArgs e)
@@ -380,16 +387,8 @@ namespace XMLParserWinForms
         private TreeView GetTree(object sender)
         {
             ToolStripMenuItem menuItem = (sender as ToolStripMenuItem);
-            if (menuItem == null)
-            {
-                return null;
-            }
-            ContextMenuStrip menuStrip = (menuItem.Owner as ContextMenuStrip);
-            if (menuStrip == null)
-            {
-                return null;
-            }
-            TreeView result = (menuStrip.SourceControl as TreeView);
+            ContextMenuStrip menuStrip = menuItem?.Owner as ContextMenuStrip;
+            TreeView result = menuStrip?.SourceControl as TreeView;
 
             return result;
         }
@@ -397,40 +396,37 @@ namespace XMLParserWinForms
         private void ExpandAllTreeEvent(object sender, EventArgs e)
         {
             TreeView tree = GetTree(sender);
-            if (tree != null)
-            {
-                tree.ExpandAll();
-            }
+            tree?.ExpandAll();
         }
 
         private void CollapseAllTreeEvent(object sender, EventArgs e)
         {
             TreeView tree = GetTree(sender);
-            if (tree != null)
-            {
-                tree.CollapseAll();
-            }
+            tree?.CollapseAll();
         }
 
     }
 
     // Constants
 
-    internal static class MessagesConsts
+    internal static partial class MessagesConsts
     {
-        public static string WarningMessageCaption { get { return "Warning"; } }
-        public static string ErrorMessageCaption { get { return "Error"; } }
-        public static string InfoMessageCaption { get { return "Information"; } }
+        public static string WarningMessageCaption => "Warning";
+        public static string ErrorMessageCaption => "Error";
+        public static string InfoMessageCaption => "Information";
+        public static string QuestionCaption => "Question";
         //public static string FileSavedMessage { get { return "File \"{0}\" successfully saved!"; } }
-        public static string FileNotSavedMessage { get { return "File \"{0}\" is not saved.\nDo you want to save it before closing?"; } }
-        public static string FileCantSaveMessage { get { return "Can't save file \"{0}\"."; } }
-        public static string FileCantLoadMessage { get { return "Can't load file \"{0}\"."; } }
-        public static string FileCantReadMessage { get { return "Can't read file \"{0}\"."; } }
+        public static string FileNotSavedMessage => "File \"{0}\" is not saved.\nDo you want to save it before closing?";
+        public static string FileCantSaveMessage => "Can't save file \"{0}\".";
+        public static string FileCantLoadMessage => "Can't load file \"{0}\".";
+        public static string FileCantReadMessage => "Can't read file \"{0}\".";
+        public static string ReloadFileQuestion => "File {0} has changed.\nDo you want to reload it?";
     }
 
     internal static class StringConstants
     {
-        public static string NewTabName { get { return "New Tab"; } }
-        public static string UnsavedTabPostfix { get { return "*"; } }
+        public static string NewTabName => "New Tab";
+        public static string UnsavedTabPostfix => "*";
+        public static string TreeViewControlName => "XmlTreeView";
     }
 }
